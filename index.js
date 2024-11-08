@@ -2,11 +2,13 @@ const jsonServer = require("json-server");
 const morgan = require("morgan");
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const cors = require("cors");
+
+// Create server and router
 const server = jsonServer.create();
 const router = jsonServer.router("db.json");
 const middlewares = jsonServer.defaults();
 const port = process.env.PORT || 8080;
-const cors = require("cors");
 
 // Swagger configuration
 const swaggerOptions = {
@@ -15,8 +17,7 @@ const swaggerOptions = {
     info: {
       title: "Employee API",
       version: "1.0.0",
-      description:
-        "A simple API to manage employees and filter them based on various criteria",
+      description: "A simple API to manage employees and filter them based on various criteria",
     },
     servers: [
       {
@@ -39,44 +40,44 @@ server.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Use Morgan for logging
 server.use(morgan("dev"));
 
-server.use(cors()); // Enable CORS for all routes
+// Enable CORS for all routes
+server.use(cors());
 
-// Custom filtering logic based on query parameters
-server.use((req, res, next) => {
+// Serve the entire db.json on the root path
+server.get("/", (req, res) => {
+  res.json(router.db.getState());
+});
+
+// Custom filtering logic specifically for the /employees route
+server.get("/employees", (req, res, next) => {
   let { limit, page, gender, education, company, search } = req.query;
   const db = router.db;
 
+  // Start with the full list of employees
   let employees = db.get("employees");
 
+  // Apply filters based on query parameters
   if (gender) {
-    employees = employees.filter(
-      (employee) => employee.gender.toLowerCase() === gender.toLowerCase()
-    );
+    employees = employees.filter(employee => employee.gender.toLowerCase() === gender.toLowerCase());
   }
-
   if (education) {
-    employees = employees.filter(
-      (employee) => employee.education.toLowerCase() === education.toLowerCase()
-    );
+    employees = employees.filter(employee => employee.education.toLowerCase() === education.toLowerCase());
   }
-
   if (company) {
-    employees = employees.filter(
-      (employee) => employee.company.toLowerCase() === company.toLowerCase()
-    );
+    employees = employees.filter(employee => employee.company.toLowerCase() === company.toLowerCase());
   }
-
   if (search) {
     const searchLower = search.toLowerCase();
-    employees = employees.filter((employee) => {
+    employees = employees.filter(employee => {
       return Object.values(employee).some(
-        (value) => value && value.toString().toLowerCase().includes(searchLower)
+        value => value && value.toString().toLowerCase().includes(searchLower)
       );
     });
   }
 
   employees = employees.value();
 
+  // Apply pagination if limit is specified
   if (limit) {
     const limitNumber = parseInt(limit, 10);
     const pageNumber = parseInt(page, 10) || 1;
@@ -86,14 +87,13 @@ server.use((req, res, next) => {
   }
 
   res.locals.data = employees;
-
   res.json(employees);
 });
 
-// Use default middlewares (e.g., for CORS, security, etc.)
+// Use default middlewares for other routes (e.g., /posts, /comments)
 server.use(middlewares);
 
-// Use JSON server router
+// Use JSON server router for other routes
 server.use(router);
 
 // Start server
