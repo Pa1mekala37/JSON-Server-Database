@@ -6,6 +6,8 @@ const server = jsonServer.create();
 const router = jsonServer.router("db.json");
 const middlewares = jsonServer.defaults();
 const port = process.env.PORT || 8080;
+const cors = require('cors');
+
 
 // Swagger configuration
 const swaggerOptions = {
@@ -21,7 +23,7 @@ const swaggerOptions = {
         url: `http://localhost:${port}`,  // Local server URL
       },
       {
-        url: "https://my-json-server-rtt0.onrender.com",  // Live server URL
+        url: `https://my-json-server-rtt0.onrender.com`,  // Live server URL
       },
     ],
   },
@@ -36,6 +38,8 @@ server.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Use Morgan for logging
 server.use(morgan('dev'));
+
+server.use(cors()); // Enable CORS for all routes
 
 // Custom filtering logic based on query parameters
 server.use((req, res, next) => {
