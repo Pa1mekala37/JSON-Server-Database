@@ -105,7 +105,7 @@ setInterval(async () => {
   } catch (error) {
     console.error("Health check failed:", error.message);
   }
-}, 5000); // 10 seconds
+}, 30000); // 30 seconds
 
 
 // Use default middlewares for other routes (e.g., /posts, /comments)
