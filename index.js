@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cors = require("cors");
+const axios = require("axios");
 
 // Create server and router
 const server = jsonServer.create();
@@ -89,6 +90,23 @@ server.get("/employees", (req, res, next) => {
   res.locals.data = employees;
   res.json(employees);
 });
+
+
+server.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+const healthCheckUrl = `https://my-json-server-rtt0.onrender.com/health`;
+
+setInterval(async () => {
+  try {
+    const response = await axios.get(healthCheckUrl);
+    console.log("Health check passed:", response.data);
+  } catch (error) {
+    console.error("Health check failed:", error.message);
+  }
+}, 5000); // 10 seconds
+
 
 // Use default middlewares for other routes (e.g., /posts, /comments)
 server.use(middlewares);
