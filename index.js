@@ -93,6 +93,8 @@ server.get("/employees", (req, res, next) => {
 
 
 server.get("/health", (req, res) => {
+  const logMessage = `🔥 Health endpoint hit at ${new Date().toISOString()} - Status: ok 🚀`;
+  console.log(logMessage); // Log the custom message to the server logs
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
@@ -105,7 +107,7 @@ setInterval(async () => {
   } catch (error) {
     console.error("Health check failed:", error.message);
   }
-}, 30000); // 30 seconds
+}, 45000); // 45 seconds
 
 
 // Use default middlewares for other routes (e.g., /posts, /comments)
