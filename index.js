@@ -98,16 +98,16 @@ server.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-const healthCheckUrl = `https://my-json-server-rtt0.onrender.com/health`;
+// const healthCheckUrl = `https://my-json-server-rtt0.onrender.com/health`;
 
-setInterval(async () => {
-  try {
-    const response = await axios.get(healthCheckUrl);
-    console.log("Health check passed:", response.data);
-  } catch (error) {
-    console.error("Health check failed:", error.message);
-  }
-}, 45000); // 45 seconds
+// setInterval(async () => {
+//   try {
+//     const response = await axios.get(healthCheckUrl);
+//     console.log("Health check passed:", response.data);
+//   } catch (error) {
+//     console.error("Health check failed:", error.message);
+//   }
+// }, 45000); // 45 seconds
 
 
 // Use default middlewares for other routes (e.g., /posts, /comments)
